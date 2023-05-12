@@ -28,3 +28,8 @@ Or simply using:
 ```sh
 docker-compose up --build
 ```
+
+## Basic Auth
+The haproxy has a basic auth feature. In this repos, I also added a simple example of a auth.
+The file `./haproxy/users.cfg` contains the userlist. The password need to he a sha-256 hash.
+If you want just add the raw password, change the field "password" to "insecure-password".

@@ -16,7 +16,12 @@ const agent = new Agent({
 axios.defaults.httpsAgent = agent;
 
 console.info("Doing request to gateway...");
-const req = axios.get(GATEWAY_URI);
+const req = axios.get(GATEWAY_URI, {
+  auth: {
+    username: "morg",
+    password: "1025"
+  }
+});
 req
   .then((res) => {
     console.info("Request completed.");

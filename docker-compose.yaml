@@ -20,5 +20,6 @@ services:
     build:
       context: ./
       dockerfile: ./haproxy/Dockerfile
+    command: haproxy -f ./haproxy.cfg -f ./users.cfg
     depends_on:
       - test-server

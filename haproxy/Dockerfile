@@ -10,3 +10,4 @@ USER haproxy
 # Get the config file and the CA cert.
 COPY --chown=haproxy ./certs/ca* ./
 COPY --chown=haproxy ./haproxy/haproxy.cfg .
+COPY --chown=haproxy ./haproxy/users.cfg .
