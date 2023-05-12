@@ -7,7 +7,6 @@ USER root
 RUN apk upgrade --update --no-cache
 USER haproxy
 
-# Get the config file
-COPY haproxy.cfg .
-COPY --chown=haproxy ca.crt .
-COPY --chown=haproxy ca.crt.key .
+# Get the config file and the CA cert.
+COPY --chown=haproxy ./certs/ca* ./
+COPY --chown=haproxy ./haproxy/haproxy.cfg .

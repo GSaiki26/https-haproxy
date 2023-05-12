@@ -1,37 +1,27 @@
 // Libs
-import * as fs from "fs";
+import { readFileSync } from "fs";
+import { Agent } from "https";
 
 import axios from "axios";
-import https from "https";
 
-// Functions
-async function main() {
-    // console.info('Request to server...');
-    // try {
-    //     await axios.get("https://test-server:8000");
-    //     console.log('Nice.');
-    // } catch (err) {
-    //     console.warn('Fuck');
-    //     console.error(err);
-    // }
-
-    console.info('Request to haproxy...');
-    try {
-        await axios.get("https://test-haproxy:8000");
-        console.log('Nice.');
-    } catch (err) {
-        console.warn('Fuck');
-        console.error(err);
-    }
-}
-
-// Code
-const agent = new https.Agent({
-    // rejectUnauthorized: true,
-    // requestCert: true,
-    ca: fs.readFileSync('./certs/ca.crt')
+// Data
+const GATEWAY_URI = "https://test-haproxy:8000";
+const agent = new Agent({
+  ca: readFileSync("./certs/ca.pem"),
+  cert: readFileSync("./certs/client.pem"),
+  key: readFileSync("./certs/client.pem.key"),
 });
 
+// Code
 axios.defaults.httpsAgent = agent;
 
-main();
+console.info("Doing request to gateway...");
+const req = axios.get(GATEWAY_URI);
+req
+  .then((res) => {
+    console.info("Request completed.");
+    console.info(`Body: ${res.data}`);
+  })
+  .catch((err) => {
+    console.error(`Request not completed. Error: ${err}`);
+  });
