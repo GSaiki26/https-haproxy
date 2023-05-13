@@ -1,32 +1,31 @@
 // Libs
 import { readFileSync } from "fs";
-import { Agent } from "https";
 
-import axios from "axios";
+import * as grpc from "@grpc/grpc-js";
+import { loadSync } from "@grpc/proto-loader";
 
 // Data
-const GATEWAY_URI = "https://test-haproxy:8000";
-const agent = new Agent({
-  ca: readFileSync("./certs/ca.pem"),
-  cert: readFileSync("./certs/client.pem"),
-  key: readFileSync("./certs/client.pem.key"),
-});
+const GATEWAY_URI = "test-haproxy:8000";
+const toolsProto = loadSync("./src/proto/tools.proto");
+const toolsPackage: any = grpc.loadPackageDefinition(toolsProto).tools;
+const creds = grpc.ChannelCredentials.createSsl(
+  readFileSync("./certs/ca.pem"),
+  readFileSync("./certs/client.pem.key"),
+  readFileSync("./certs/client.pem"),
+);
 
 // Code
-axios.defaults.httpsAgent = agent;
-
 console.info("Doing request to gateway...");
-const req = axios.get(GATEWAY_URI, {
-  auth: {
-    username: "morg",
-    password: "1025"
-  }
-});
-req
-  .then((res) => {
-    console.info("Request completed.");
-    console.info(`Body: ${res.data}`);
-  })
-  .catch((err) => {
+const client = new toolsPackage.ToolsService(GATEWAY_URI, grpc.ChannelCredentials.createInsecure());
+
+client.Ping({
+  state: 1
+}, (err: Error, res: any) => {
+  if (err) {
     console.error(`Request not completed. Error: ${err}`);
-  });
+    return;
+  }
+
+  console.info("Request completed.");
+  console.info(`Body: \n\n${JSON.stringify(res, null, 4)}`);
+});

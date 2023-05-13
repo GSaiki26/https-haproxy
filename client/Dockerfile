@@ -29,6 +29,7 @@ RUN yarn
 
 COPY --chown=node ./client/tsconfig.json .
 COPY --chown=node ./client/src ./src
+COPY --chown=node ./proto ./src/proto
 
 # Run the project
 

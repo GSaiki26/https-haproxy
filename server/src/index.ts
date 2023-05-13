@@ -1,30 +1,40 @@
 // Libs
 import { readFileSync } from "fs";
-import { createServer } from "https";
 
-import express from "express";
-import helmet from "helmet";
-import router from "./router/router";
+import * as grpc from "@grpc/grpc-js";
+import { loadSync } from "@grpc/proto-loader";
+
+import ToolsService from "./services/toolsService";
 
 // Data
-const app = express();
-const PORT = 8000;
+const HOST = "0.0.0.0:8000";
+const server = new grpc.Server();
+const toolsProto = loadSync("./src/proto/tools.proto");
+const toolsPackage: any = grpc.loadPackageDefinition(toolsProto).tools;
 
-// Code
-app.use(helmet());
-app.use(router);
+// Routes
+server.addService(toolsPackage.ToolsService.service, {
+  Ping: ToolsService.ping.bind(ToolsService)
+});
 
-// Create the server.
-const server = createServer(
-  {
-    cert: readFileSync("./certs/server.pem"),
-    key: readFileSync("./certs/server.pem.key"),
-    ca: readFileSync("./certs/ca.pem"),
-  },
-  app
+// Define the credentials.
+const creds = grpc.ServerCredentials.createSsl(
+    readFileSync("./certs/ca.pem"),
+    [
+      {
+        private_key: readFileSync("./certs/server.pem.key"),
+        cert_chain: readFileSync("./certs/server.pem"),
+      }
+    ], false
 );
 
 // Start the server.
-server.listen(PORT, () => {
-  console.log(`The server is online on port: ${PORT}`);
+server.bindAsync(HOST, grpc.ServerCredentials.createInsecure(), (err, port) => {
+  if (err) {
+    console.error(`Error while trying to start the server. Error: ${err}`);
+    return;
+  }
+
+  server.start();
+  console.info(`The server is online on port: ${port}`);
 });

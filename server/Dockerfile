@@ -21,7 +21,7 @@ RUN openssl req -new -nodes -out ./certs/server.csr -newkey rsa:2048 -keyout ./c
 # Sign the CSR with the CA's cert and key.
 COPY --chown=node ./certs/ca* ./certs/
 RUN openssl x509 -days 365 -req -in ./certs/server.csr -CA ./certs/ca.pem -CAkey ./certs/ca.pem.key -out ./certs/server.pem
-RUN rm ./certs/ca.pem.key
+# RUN rm ./certs/ca.pem.key
 
 # Install the packages
 COPY --chown=node ./server/package.json .
@@ -29,6 +29,7 @@ RUN yarn
 
 COPY --chown=node ./server/tsconfig.json .
 COPY --chown=node ./server/src ./src
+COPY --chown=node ./proto ./src/proto
 
 # Run the project
 RUN yarn run build
