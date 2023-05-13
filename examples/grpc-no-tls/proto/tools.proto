@@ -1,0 +1,19 @@
+// Basics
+syntax = "proto3";
+package tools;
+
+// Services
+service ToolsService {
+    rpc Ping (PingReq) returns (PingRes);
+}
+
+// Messages
+message PingReq {
+    int32 state = 1;
+}
+
+message PingRes {
+    string status = 1;
+    optional string message = 2;
+    optional PingReq data = 3;
+}
