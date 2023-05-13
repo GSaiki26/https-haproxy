@@ -3,7 +3,7 @@ FROM node:19.2-alpine
 WORKDIR /app
 
 # Envs
-ENV SUBJ="/C=US/ST=California/L=San Francisco/O=Example Company/OU=IT Department/CN=test-haproxy"
+ENV SUBJ="/C=US/ST=California/L=San Francisco/O=Example Company/OU=IT Department/CN=test-client"
 
 # Update the container
 RUN apk upgrade --update --no-cache
